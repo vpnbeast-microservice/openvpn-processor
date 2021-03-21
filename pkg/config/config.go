@@ -15,10 +15,6 @@ func ConvertStringToInt(s string) int {
 	return i
 }
 
-func ConvertIntToString(i int) string {
-	return strconv.Itoa(i)
-}
-
 func GetStringEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
@@ -33,11 +29,4 @@ func GetIntEnv(key string, defaultValue int) int {
 		return defaultValue
 	}
 	return ConvertStringToInt(value)
-}
-
-func ifThenElse(condition bool, a interface{}, b interface{}) interface{} {
-	if condition {
-		return a
-	}
-	return b
 }

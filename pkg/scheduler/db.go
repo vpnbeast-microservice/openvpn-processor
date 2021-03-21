@@ -56,7 +56,7 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 		}
 	}
 	log.Println("Ending DB remove unreachable server execution, removed", removedServerCount, "servers, took",
-		time.Now().Sub(beforeExecution))
+		time.Since(beforeExecution))
 }
 
 func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int) {
@@ -88,7 +88,7 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 		log.Fatal(err)
 	}
 	log.Println("Ending DB insert reachable server execution, inserted", insertedServerCount, " servers, " +
-		"skipped", skippedServerCount, "servers, took", time.Now().Sub(beforeExecution))
+		"skipped", skippedServerCount, "servers, took", time.Since(beforeExecution))
 }
 
 func removeServers(db *sql.DB, ip string, proto string, confData string, port int) {

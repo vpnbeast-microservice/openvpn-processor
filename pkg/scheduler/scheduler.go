@@ -13,5 +13,5 @@ func RunBackground(db *sql.DB, vpnGateUrl string, dialTcpTimeoutSeconds int) {
 	vpnServers := createStructsFromCsv(csvContent)
 	checkUnreachableServersOnDB(db, dialTcpTimeoutSeconds)
 	insertServers(db, vpnServers, dialTcpTimeoutSeconds)
-	log.Println("Ending scheduler execution, took", time.Now().Sub(beforeMainExecution))
+	log.Println("Ending scheduler execution, took", time.Since(beforeMainExecution))
 }

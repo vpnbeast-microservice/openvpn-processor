@@ -42,7 +42,7 @@ func main() {
 	go func() {
 		scheduler.RunBackground(db, vpnGateUrl, dialTcpTimeoutSeconds) // calling for the instant run before ticker ticks
 		ticker := time.NewTicker(time.Duration(int32(tickerIntervalMin)) * time.Minute)
-		for _ = range ticker.C {
+		for range ticker.C {
 			scheduler.RunBackground(db, vpnGateUrl, dialTcpTimeoutSeconds)
 		}
 	}()
