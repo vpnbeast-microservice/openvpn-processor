@@ -5,7 +5,7 @@ import (
 	"log"
 	"openvpn-processor/pkg/config"
 	"openvpn-processor/pkg/scheduler"
-	"openvpn-processor/pkg/web"
+	"openvpn-processor/pkg/probe"
 	"time"
 )
 
@@ -31,7 +31,7 @@ func main() {
 
 	go func() {
 		log.Println("Creating a router for db health checks...")
-		web.RunHealthProbe(db, healthCheckMaxTimeoutMin)
+		probe.RunHealthProbe(db, healthCheckMaxTimeoutMin)
 	}()
 
 	go func() {
