@@ -9,15 +9,10 @@ import (
 	"time"
 )
 
-var vpnGateUrl string
-var dbUrl string
-var dbDriver string
-var tickerIntervalMin int
-var dbMaxOpenConn int
-var dbMaxIdleConn int
-var dbConnMaxLifetimeMin int
-var healthCheckMaxTimeoutMin int
-var dialTcpTimeoutSeconds int
+var (
+	vpnGateUrl, dbUrl, dbDriver string
+	tickerIntervalMin, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin, healthCheckMaxTimeoutMin, dialTcpTimeoutSeconds int
+)
 
 func init() {
 	vpnGateUrl = config.GetStringEnv("API_URL", "https://www.vpngate.net/api/iphone/")
