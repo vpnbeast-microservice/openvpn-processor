@@ -11,7 +11,7 @@ function git_commit_and_push() {
     git commit -am "[ci-skip] version ${RELEASE_VERSION}.RELEASE"
     git tag -a "v${RELEASE_VERSION}" -m "v${RELEASE_VERSION} tagged"
     git status
-    git push --force --follow-tags ${PUSH_URL} HEAD:${BRANCH}
+    git push --follow-tags ${PUSH_URL} origin ${BRANCH}
 }
 
 function increment_minor_version() {
