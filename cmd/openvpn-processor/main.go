@@ -2,10 +2,9 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"log"
 	"openvpn-processor/pkg/config"
-	"openvpn-processor/pkg/scheduler"
 	"openvpn-processor/pkg/probe"
+	"openvpn-processor/pkg/scheduler"
 	"time"
 )
 
@@ -30,12 +29,12 @@ func main() {
 	db := scheduler.InitDb(dbDriver, dbUrl, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin)
 
 	go func() {
-		log.Println("Creating a router for db health checks...")
 		probe.RunHealthProbe(db, healthCheckMaxTimeoutMin)
 	}()
 
 	go func() {
-		scheduler.RunBackground(db, vpnGateUrl, dialTcpTimeoutSeconds) // calling for the instant run before ticker ticks
+		// calling for the instant run before ticker ticks
+		scheduler.RunBackground(db, vpnGateUrl, dialTcpTimeoutSeconds)
 		ticker := time.NewTicker(time.Duration(int32(tickerIntervalMin)) * time.Minute)
 		for range ticker.C {
 			scheduler.RunBackground(db, vpnGateUrl, dialTcpTimeoutSeconds)
