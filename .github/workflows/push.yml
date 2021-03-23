@@ -81,6 +81,8 @@ jobs:
         run: make build
 
   tag:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
