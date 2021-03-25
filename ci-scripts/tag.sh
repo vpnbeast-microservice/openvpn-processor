@@ -39,7 +39,7 @@ CHART_NAME=openvpn-processor
 BRANCH=master
 CURRENT_VERSION=$(grep RELEASE_VERSION version.properties | cut -d "=" -f2)
 RELEASE_VERSION=$(increment_minor_version ${CURRENT_VERSION})
-PUSH_URL=https://${USERNAME}:${GIT_ACCESS_TOKEN}@github.com/vpnbeast/${PROJECT_NAME}.git
+PUSH_URL=https://${USERNAME}:08d34d8f7eff18fb91cf32a691facabffc6081c2@github.com/vpnbeast/${PROJECT_NAME}.git
 
 set_version $CURRENT_VERSION $RELEASE_VERSION
 set_chart_version
