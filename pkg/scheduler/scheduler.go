@@ -2,16 +2,23 @@ package scheduler
 
 import (
 	"database/sql"
-	"log"
+	"go.uber.org/zap"
+	"openvpn-processor/pkg/logging"
 	"time"
 )
 
+var logger *zap.Logger
+
+func init() {
+	logger = logging.GetLogger()
+}
+
 func RunBackground(db *sql.DB, vpnGateUrl string, dialTcpTimeoutSeconds int) {
-	log.Println("Starting scheduler execution...")
+	logger.Info("Starting scheduler execution")
 	beforeMainExecution := time.Now()
 	csvContent := getCsvContent(vpnGateUrl)
 	vpnServers := createStructsFromCsv(csvContent)
 	checkUnreachableServersOnDB(db, dialTcpTimeoutSeconds)
 	insertServers(db, vpnServers, dialTcpTimeoutSeconds)
-	log.Println("Ending scheduler execution, took", time.Since(beforeMainExecution))
+	logger.Info("Ending scheduler execution", zap.Duration("executionTime", time.Since(beforeMainExecution)))
 }

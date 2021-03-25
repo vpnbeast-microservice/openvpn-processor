@@ -2,7 +2,7 @@ package scheduler
 
 import (
 	"database/sql"
-	"log"
+	"go.uber.org/zap"
 	"strings"
 	"time"
 )
@@ -10,7 +10,7 @@ import (
 func InitDb(dbDriver, dbUrl string, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin int) *sql.DB {
 	db, err := sql.Open(dbDriver, dbUrl)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("fatal error occured while opening database connection", zap.String("error", err.Error()))
 	}
 	tuneDbPooling(db, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin)
 	return db
@@ -32,22 +32,32 @@ func tuneDbPooling(db *sql.DB, dbMaxOpenConn int, dbMaxIdleConn int, dbConnMaxLi
 }
 
 func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
-	log.Println("Starting DB remove unreachable server execution...")
+	logger.Info("starting remove unreachable server operation on database")
 	var (
 		removedServerCount = 0
 		port int
 		ip, confData, proto string
 		beforeExecution = time.Now()
 	)
-	rows, err := db.Query("SELECT ip, proto, conf_data, port FROM servers")
+	query := "SELECT ip, proto, conf_data, port FROM servers"
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal("fatal error occured while querying database", zap.String("query", query),
+			zap.String("error", err.Error()))
 	}
-	defer rows.Close()
+
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
 	for rows.Next() {
 		err := rows.Scan(&ip, &proto, &confData, &port)
 		if err != nil {
-			log.Fatalln(err)
+			logger.Fatal("fatal error occured while scanning database", zap.String("ip", ip),
+				zap.String("proto", proto), zap.Int("port", port), zap.String("error", err.Error()))
 		}
 
 		if !isServerInsertable(ip, proto, confData, port, dialTcpTimeoutSeconds) {
@@ -55,12 +65,13 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 			removeServers(db, ip, proto, confData, port)
 		}
 	}
-	log.Println("Ending DB remove unreachable server execution, removed", removedServerCount, "servers, took",
-		time.Since(beforeExecution))
+
+	logger.Info("Ending remove unreachable server operation on database", zap.Int("removedServerCount", removedServerCount),
+		zap.Duration("executionTime", time.Since(beforeExecution)))
 }
 
 func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int) {
-	log.Println("Starting DB insert reachable server execution...")
+	logger.Info("Starting insert reachable server operation on database")
 	var (
 		insertedServerCount = 0
 		skippedServerCount = 0
@@ -85,20 +96,24 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 	stmt, _ := db.Prepare(sqlStr)
 	_, err := stmt.Exec(values...)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("fatal error occured while executing query on database", zap.String("query", sqlStr),
+			zap.String("error", err.Error()))
 	}
-	log.Println("Ending DB insert reachable server execution, inserted", insertedServerCount, " servers, " +
-		"skipped", skippedServerCount, "servers, took", time.Since(beforeExecution))
+
+	logger.Info("Ending insert reachable server operation on database", zap.Int("insertedServerCount", insertedServerCount),
+		zap.Int("skippedServerCount", skippedServerCount), zap.Duration("executionTime", time.Since(beforeExecution)))
 }
 
 func removeServers(db *sql.DB, ip string, proto string, confData string, port int) {
-	del, err := db.Prepare("DELETE FROM servers WHERE ip=? AND conf_data=? AND proto=? AND port=?")
+	query := "DELETE FROM servers WHERE ip=? AND conf_data=? AND proto=? AND port=?"
+	del, err := db.Prepare(query)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	_, err = del.Exec(ip, confData, proto, port)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal("fatal error occured while executing query on database", zap.String("ip", ip),
+			zap.String("proto", proto), zap.Int("port", port), zap.String("error", err.Error()))
 	}
 }

@@ -2,7 +2,9 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
+	"go.uber.org/zap"
 	"openvpn-processor/pkg/config"
+	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/probe"
 	"openvpn-processor/pkg/scheduler"
 	"time"
@@ -11,9 +13,12 @@ import (
 var (
 	vpnGateUrl, dbUrl, dbDriver string
 	tickerIntervalMin, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin, healthCheckMaxTimeoutMin, dialTcpTimeoutSeconds int
+	logger *zap.Logger
 )
 
 func init() {
+	logger = logging.GetLogger()
+
 	vpnGateUrl = config.GetStringEnv("API_URL", "https://www.vpngate.net/api/iphone/")
 	dbUrl = config.GetStringEnv("DB_URL", "spring:123asd456@tcp(127.0.0.1:3306)/vpnbeast")
 	dbDriver = config.GetStringEnv("DB_DRIVER", "mysql")
@@ -26,6 +31,13 @@ func init() {
 }
 
 func main() {
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
 	db := scheduler.InitDb(dbDriver, dbUrl, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin)
 
 	go func() {

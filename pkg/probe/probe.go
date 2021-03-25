@@ -5,10 +5,17 @@ import (
 	"database/sql"
 	"github.com/etherlabsio/healthcheck"
 	"github.com/gorilla/mux"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
+	"openvpn-processor/pkg/logging"
 	"time"
 )
+
+var logger *zap.Logger
+
+func init() {
+	logger = logging.GetLogger()
+}
 
 func RunHealthProbe(db *sql.DB, healthCheckMaxTimeoutMin int) {
 	router := mux.NewRouter()
@@ -24,6 +31,12 @@ func RunHealthProbe(db *sql.DB, healthCheckMaxTimeoutMin int) {
 			),
 		),
 	))
-	log.Println("Listening on port 9290 for health probes...")
-	log.Fatal(http.ListenAndServe(":9290" , router))
+
+	err := http.ListenAndServe(":9290" , router)
+	if err != nil {
+		logger.Fatal("fatal error occured while spinning up router", zap.String("addr", ":9290"),
+			zap.String("error", err.Error()))
+	}
+
+	logger.Info("listening on port 9290 for health probes")
 }

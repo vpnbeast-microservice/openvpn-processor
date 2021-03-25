@@ -5,9 +5,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"openvpn-processor/pkg/config"
@@ -36,7 +36,7 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 
 		decodedByteSlice, err := base64.StdEncoding.DecodeString(entry[14])
 		if err != nil {
-			log.Printf("An error occured while decoding conf data of %s, skipping this one...\n", entry[0])
+			logger.Warn("an error occured while decoding conf data, skipping", zap.String("data", entry[0]))
 			continue
 		}
 
@@ -55,22 +55,34 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 		}
 		vpnServers = append(vpnServers, server)
 	}
-	log.Printf("%d servers found\n", len(vpnServers))
+
+	logger.Info("successfully created structs from csv", zap.Int("structsCreated", len(vpnServers)))
 	return vpnServers
 }
 
 func getCsvContent(vpnGateUrl string) [][] string {
-	log.Printf("getting server list from %s\n", vpnGateUrl)
+	logger.Info("getting server list from vpngate", zap.String("vpnGateUrl", vpnGateUrl))
 	var csvContent [][]string
 	resp, err := http.Get(vpnGateUrl)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("an error occured while making GET request", zap.String("vpnGateUrl", vpnGateUrl),
+			zap.String("error", err.Error()))
+		return nil
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
 	encodedBody, err := ioutil.ReadAll(resp.Body)
 	decodedBody := string(encodedBody)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("an error occured while reading response body", zap.String("vpnGateUrl", vpnGateUrl),
+			zap.String("error", err.Error()))
+		return nil
 	}
 	reader := csv.NewReader(strings.NewReader(decodedBody))
 	for {

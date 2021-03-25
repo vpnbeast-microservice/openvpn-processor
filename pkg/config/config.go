@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 	"strconv"
 )
@@ -9,7 +8,6 @@ import (
 func ConvertStringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
-		log.Printf("An error occured while converting %s to int. Setting it as zero.", s)
 		i = 0
 	}
 	return i
