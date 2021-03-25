@@ -16,10 +16,10 @@ function git_commit_and_push() {
 
 function increment_minor_version() {
     local version_major=$(echo $1 | cut -d "." -f 1)
-    local version_patch=$(echo $1 | cut -d "." -f 2)
-    local version_minor=$(echo $1 | cut -d "." -f 3)
-    version_minor=`expr ${version_minor} + 1`
-    echo "${version_major}.${version_patch}.${version_minor}"
+    local version_minor=$(echo $1 | cut -d "." -f 2)
+    local version_patch=$(echo $1 | cut -d "." -f 3)
+    version_patch=`expr ${version_patch} + 1`
+    echo "${version_major}.${version_minor}.${version_patch}"
 }
 
 function set_version() {
