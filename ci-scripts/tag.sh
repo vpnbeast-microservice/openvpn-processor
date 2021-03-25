@@ -28,6 +28,7 @@ function set_version() {
 
 function set_chart_version() {
     sed -i "s/${CURRENT_VERSION}/${RELEASE_VERSION}/g" charts/${CHART_NAME}/Chart.yaml
+    sed -i "s/${CURRENT_VERSION}/${RELEASE_VERSION}/g" charts/${CHART_NAME}/values.yaml
 }
 
 set -ex
