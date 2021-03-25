@@ -18,7 +18,6 @@ var (
 
 func init() {
 	logger = logging.GetLogger()
-
 	vpnGateUrl = config.GetStringEnv("API_URL", "https://www.vpngate.net/api/iphone/")
 	dbUrl = config.GetStringEnv("DB_URL", "spring:123asd456@tcp(127.0.0.1:3306)/vpnbeast")
 	dbDriver = config.GetStringEnv("DB_DRIVER", "mysql")

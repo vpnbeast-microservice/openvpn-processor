@@ -71,15 +71,16 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 }
 
 func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int) {
-	logger.Info("Starting insert reachable server operation on database")
 	var (
 		insertedServerCount = 0
 		skippedServerCount = 0
 		beforeExecution = time.Now()
 		values []interface{}
+		sqlStr = "REPLACE INTO servers(id, uuid, hostname, ip, port, conf_data, proto, enabled, score, ping, speed, " +
+			"country_long, country_short, num_vpn_sessions, uptime, total_users, total_traffic, created_at) VALUES "
 	)
-	var sqlStr = "REPLACE INTO servers(id, uuid, hostname, ip, port, conf_data, proto, enabled, score, ping, speed, " +
-		"country_long, country_short, num_vpn_sessions, uptime, total_users, total_traffic, created_at) VALUES "
+
+	logger.Info("Starting insert reachable server operation on database")
 	for index, server := range vpnServers {
 		if !isServerInsertable(server.ip, server.proto, server.confData, server.port, dialTcpTimeoutSeconds) {
 			skippedServerCount++
