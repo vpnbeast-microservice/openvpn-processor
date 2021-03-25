@@ -11,7 +11,7 @@ function git_commit_and_push() {
     git commit -am "[ci-skip] version ${RELEASE_VERSION}.RELEASE"
     git tag -a "v${RELEASE_VERSION}" -m "v${RELEASE_VERSION} tagged"
     git status
-    git push --force --follow-tags ${PUSH_URL} origin ${BRANCH}
+    git push --force --follow-tags ${PUSH_URL} HEAD:${BRANCH}
 }
 
 function increment_minor_version() {
@@ -37,7 +37,7 @@ PROJECT_NAME=openvpn-processor
 GIT_ACCESS_TOKEN=$1
 CHART_NAME=openvpn-processor
 BRANCH=master
-CURRENT_VERSION=`grep RELEASE_VERSION version.properties | cut -d "=" -f2`
+CURRENT_VERSION=$(grep RELEASE_VERSION version.properties | cut -d "=" -f2)
 RELEASE_VERSION=$(increment_minor_version ${CURRENT_VERSION})
 PUSH_URL=https://${USERNAME}:${GIT_ACCESS_TOKEN}@github.com/vpnbeast/${PROJECT_NAME}.git
 
