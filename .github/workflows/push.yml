@@ -90,7 +90,7 @@ jobs:
       - name: Set tag.sh executable
         run: chmod +x ci-scripts/tag.sh
       - name: Run tag.sh
-        run: /bin/bash ci-scripts/tag.sh ${{ secrets.GIT_ACCESS_TOKEN }}
+        run: /bin/bash ci-scripts/tag.sh ${{ secrets.GITHUB_TOKEN }}
 
   docker:
     runs-on: ubuntu-latest
