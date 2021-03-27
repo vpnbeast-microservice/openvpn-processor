@@ -30,11 +30,6 @@ func RunHealthProbe(db *sql.DB, healthCheckMaxTimeoutMin int) {
 		),
 	))
 
-	err := http.ListenAndServe(":9290" , router)
-	if err != nil {
-		logger.Fatal("fatal error occured while spinning up router", zap.String("addr", ":9290"),
-			zap.String("error", err.Error()))
-	}
-
-	logger.Info("listening on port 9290 for health probes")
+	logger.Info("metric server is up and running", zap.Int("port", 9290))
+	panic(http.ListenAndServe(":9290" , router))
 }
