@@ -2,7 +2,7 @@
 
 deployment:
   name: openvpn-processor
-  image: bilalcaliskan/openvpn-processor:1.0.34
+  image: bilalcaliskan/openvpn-processor:1.0.35
   replicaCount: 1
   managementPort: 9290
   managementEndpoint: /health
