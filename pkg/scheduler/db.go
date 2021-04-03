@@ -3,6 +3,7 @@ package scheduler
 import (
 	"database/sql"
 	"go.uber.org/zap"
+	"openvpn-processor/pkg/metrics"
 	"strings"
 	"time"
 )
@@ -84,9 +85,11 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 	for index, server := range vpnServers {
 		if !isServerInsertable(server.ip, server.proto, server.confData, server.port, dialTcpTimeoutSeconds) {
 			skippedServerCount++
+			metrics.SkippedCounter.Inc()
 			continue
 		}
 		insertedServerCount++
+		metrics.InsertedCounter.Inc()
 		sqlStr += "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?),"
 		values = append(values, index + 1, server.uuid, server.hostname, server.ip, server.port, server.confData,
 			server.proto, server.enabled, server.score, server.ping, server.speed, server.countryLong,

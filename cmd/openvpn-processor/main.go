@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"openvpn-processor/pkg/config"
 	"openvpn-processor/pkg/logging"
+	"openvpn-processor/pkg/metrics"
 	"openvpn-processor/pkg/probe"
 	"openvpn-processor/pkg/scheduler"
 	"time"
@@ -42,6 +43,8 @@ func main() {
 	go func() {
 		probe.RunHealthProbe(db, healthCheckMaxTimeoutMin)
 	}()
+
+	go metrics.RunMetricsServer()
 
 	go func() {
 		// calling for the instant run before ticker ticks
