@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// ConvertStringToInt converts string from environment variable to integer value
 func ConvertStringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
@@ -13,6 +14,7 @@ func ConvertStringToInt(s string) int {
 	return i
 }
 
+// GetStringEnv gets the environment variable if provided, returns the default value if not provided
 func GetStringEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
@@ -21,6 +23,7 @@ func GetStringEnv(key, defaultValue string) string {
 	return value
 }
 
+// GetIntEnv gets the environment variable if provided, returns the default value if not provided
 func GetIntEnv(key string, defaultValue int) int {
 	value := os.Getenv(key)
 	if len(value) == 0 {

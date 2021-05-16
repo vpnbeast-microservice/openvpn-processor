@@ -15,7 +15,9 @@ import (
 var (
 	logger                                               *zap.Logger
 	metricsPort, writeTimeoutSeconds, readTimeoutSeconds int
+	// SkippedCounter keeps track of skipped vpn servers for various reasons
 	SkippedCounter                                       prometheus.Counter
+	// InsertedCounter keeps track of inserted vpn servers to database
 	InsertedCounter                                      prometheus.Counter
 )
 
@@ -34,10 +36,7 @@ func init() {
 	})
 }
 
-// TODO: Generate custom metrics, check below:
-// https://prometheus.io/docs/guides/go-application/
-// https://www.robustperception.io/prometheus-middleware-for-gorilla-mux
-
+// RunMetricsServer spins up a router to provide prometheus metrics
 func RunMetricsServer() {
 	defer func() {
 		err := logger.Sync()

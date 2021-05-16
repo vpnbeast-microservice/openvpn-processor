@@ -13,6 +13,7 @@ func init() {
 	logger = logging.GetLogger()
 }
 
+// RunBackground does the heavy lifting, continuously repeats the application logic
 func RunBackground(db *sql.DB, vpnGateUrl string, dialTcpTimeoutSeconds int) {
 	logger.Info("Starting scheduler execution")
 	beforeMainExecution := time.Now()

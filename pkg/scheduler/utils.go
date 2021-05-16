@@ -36,7 +36,7 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 
 		decodedByteSlice, err := base64.StdEncoding.DecodeString(entry[14])
 		if err != nil {
-			logger.Warn("an error occured while decoding conf data, skipping", zap.String("data", entry[0]))
+			logger.Warn("an error occurred while decoding conf data, skipping", zap.String("data", entry[0]))
 			continue
 		}
 
@@ -65,7 +65,7 @@ func getCsvContent(vpnGateUrl string) [][]string {
 	var csvContent [][]string
 	resp, err := http.Get(vpnGateUrl)
 	if err != nil {
-		logger.Error("an error occured while making GET request", zap.String("vpnGateUrl", vpnGateUrl),
+		logger.Error("an error occurred while making GET request", zap.String("vpnGateUrl", vpnGateUrl),
 			zap.String("error", err.Error()))
 		return nil
 	}
@@ -80,7 +80,7 @@ func getCsvContent(vpnGateUrl string) [][]string {
 	encodedBody, err := ioutil.ReadAll(resp.Body)
 	decodedBody := string(encodedBody)
 	if err != nil {
-		logger.Error("an error occured while reading response body", zap.String("vpnGateUrl", vpnGateUrl),
+		logger.Error("an error occurred while reading response body", zap.String("vpnGateUrl", vpnGateUrl),
 			zap.String("error", err.Error()))
 		return nil
 	}

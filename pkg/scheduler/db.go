@@ -8,10 +8,11 @@ import (
 	"time"
 )
 
+// InitDb gets parameters and initiate database connection, returns connection then
 func InitDb(dbDriver, dbUrl string, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin int) *sql.DB {
 	db, err := sql.Open(dbDriver, dbUrl)
 	if err != nil {
-		logger.Fatal("fatal error occured while opening database connection", zap.String("error", err.Error()))
+		logger.Fatal("fatal error occurred while opening database connection", zap.String("error", err.Error()))
 	}
 	tuneDbPooling(db, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin)
 	return db
@@ -43,7 +44,7 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 
 	rows, err := db.Query(sqlSelectServers)
 	if err != nil {
-		logger.Fatal("fatal error occured while querying database", zap.String("query", sqlSelectServers),
+		logger.Fatal("fatal error occurred while querying database", zap.String("query", sqlSelectServers),
 			zap.String("error", err.Error()))
 	}
 
@@ -57,7 +58,7 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 	for rows.Next() {
 		err := rows.Scan(&ip, &proto, &confData, &port)
 		if err != nil {
-			logger.Fatal("fatal error occured while scanning database", zap.String("ip", ip),
+			logger.Fatal("fatal error occurred while scanning database", zap.String("ip", ip),
 				zap.String("proto", proto), zap.Int("port", port), zap.String("error", err.Error()))
 		}
 
@@ -97,7 +98,7 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 	stmt, _ := db.Prepare(sqlStr)
 	_, err := stmt.Exec(values...)
 	if err != nil {
-		logger.Fatal("fatal error occured while executing query on database", zap.String("query", sqlStr),
+		logger.Fatal("fatal error occurred while executing query on database", zap.String("query", sqlStr),
 			zap.String("error", err.Error()))
 	}
 
@@ -114,7 +115,7 @@ func removeServers(db *sql.DB, ip string, proto string, confData string, port in
 
 	_, err = del.Exec(ip, confData, proto, port)
 	if err != nil {
-		logger.Fatal("fatal error occured while executing query on database", zap.String("ip", ip),
+		logger.Fatal("fatal error occurred while executing query on database", zap.String("ip", ip),
 			zap.String("proto", proto), zap.Int("port", port), zap.String("error", err.Error()))
 	}
 }

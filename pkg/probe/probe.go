@@ -17,6 +17,7 @@ func init() {
 	logger = logging.GetLogger()
 }
 
+// RunHealthProbe spins up a router and continuously checks the health of database connection
 func RunHealthProbe(db *sql.DB, healthCheckMaxTimeoutMin int) {
 	router := mux.NewRouter()
 	router.Handle("/health", healthcheck.Handler(
