@@ -17,9 +17,9 @@ import (
 
 func createStructsFromCsv(csvContent [][]string) []vpnServer {
 	var vpnServers []vpnServer
-	for _, entry := range csvContent{
+	for _, entry := range csvContent {
 		server := vpnServer{
-			uuid:			uuid.New().String(),
+			uuid:           uuid.New().String(),
 			hostname:       entry[0],
 			score:          config.ConvertStringToInt(entry[2]),
 			ping:           config.ConvertStringToInt(entry[3]),
@@ -60,7 +60,7 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 	return vpnServers
 }
 
-func getCsvContent(vpnGateUrl string) [][] string {
+func getCsvContent(vpnGateUrl string) [][]string {
 	logger.Info("getting server list from vpngate", zap.String("vpnGateUrl", vpnGateUrl))
 	var csvContent [][]string
 	resp, err := http.Get(vpnGateUrl)

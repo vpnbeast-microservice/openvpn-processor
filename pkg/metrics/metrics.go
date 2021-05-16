@@ -13,10 +13,10 @@ import (
 )
 
 var (
-	logger *zap.Logger
+	logger                                               *zap.Logger
 	metricsPort, writeTimeoutSeconds, readTimeoutSeconds int
-	SkippedCounter prometheus.Counter
-	InsertedCounter prometheus.Counter
+	SkippedCounter                                       prometheus.Counter
+	InsertedCounter                                      prometheus.Counter
 )
 
 func init() {
@@ -48,8 +48,8 @@ func RunMetricsServer() {
 
 	router := mux.NewRouter()
 	metricServer := &http.Server{
-		Handler: router,
-		Addr: fmt.Sprintf(":%d", metricsPort),
+		Handler:      router,
+		Addr:         fmt.Sprintf(":%d", metricsPort),
 		WriteTimeout: time.Duration(int32(writeTimeoutSeconds)) * time.Second,
 		ReadTimeout:  time.Duration(int32(readTimeoutSeconds)) * time.Second,
 	}

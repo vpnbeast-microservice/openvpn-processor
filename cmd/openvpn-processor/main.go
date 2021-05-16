@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	vpnGateUrl, dbUrl, dbDriver string
+	vpnGateUrl, dbUrl, dbDriver                                                                                            string
 	tickerIntervalMin, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin, healthCheckMaxTimeoutMin, dialTcpTimeoutSeconds int
-	logger *zap.Logger
+	logger                                                                                                                 *zap.Logger
 )
 
 func init() {

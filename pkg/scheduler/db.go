@@ -35,15 +35,15 @@ func tuneDbPooling(db *sql.DB, dbMaxOpenConn int, dbMaxIdleConn int, dbConnMaxLi
 func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 	logger.Info("starting remove unreachable server operation on database")
 	var (
-		removedServerCount = 0
-		port int
+		removedServerCount  = 0
+		port                int
 		ip, confData, proto string
-		beforeExecution = time.Now()
+		beforeExecution     = time.Now()
 	)
-	query := "SELECT ip, proto, conf_data, port FROM servers"
-	rows, err := db.Query(query)
+
+	rows, err := db.Query(sqlSelectServers)
 	if err != nil {
-		logger.Fatal("fatal error occured while querying database", zap.String("query", query),
+		logger.Fatal("fatal error occured while querying database", zap.String("query", sqlSelectServers),
 			zap.String("error", err.Error()))
 	}
 
@@ -74,11 +74,9 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int) {
 	var (
 		insertedServerCount = 0
-		skippedServerCount = 0
-		beforeExecution = time.Now()
-		values []interface{}
-		sqlStr = "REPLACE INTO servers(id, uuid, hostname, ip, port, conf_data, proto, enabled, score, ping, speed, " +
-			"country_long, country_short, num_vpn_sessions, uptime, total_users, total_traffic, created_at) VALUES "
+		skippedServerCount  = 0
+		beforeExecution     = time.Now()
+		values              []interface{}
 	)
 
 	logger.Info("Starting insert reachable server operation on database")
@@ -90,13 +88,12 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 		}
 		insertedServerCount++
 		metrics.InsertedCounter.Inc()
-		sqlStr += "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?),"
-		values = append(values, index + 1, server.uuid, server.hostname, server.ip, server.port, server.confData,
+		values = append(values, index+1, server.uuid, server.hostname, server.ip, server.port, server.confData,
 			server.proto, server.enabled, server.score, server.ping, server.speed, server.countryLong,
 			server.countryLong, server.numVpnSessions, server.uptime, server.totalUsers, server.totalTraffic,
 			server.createdAt)
 	}
-	sqlStr = strings.TrimSuffix(sqlStr, ",")
+	sqlStr := strings.TrimSuffix(sqlReplaceServers, ",")
 	stmt, _ := db.Prepare(sqlStr)
 	_, err := stmt.Exec(values...)
 	if err != nil {
@@ -109,9 +106,9 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 }
 
 func removeServers(db *sql.DB, ip string, proto string, confData string, port int) {
-	query := "DELETE FROM servers WHERE ip=? AND conf_data=? AND proto=? AND port=?"
-	del, err := db.Prepare(query)
+	del, err := db.Prepare(sqlDeleteServer)
 	if err != nil {
+		// TODO: do not panic, handle properly
 		panic(err)
 	}
 
