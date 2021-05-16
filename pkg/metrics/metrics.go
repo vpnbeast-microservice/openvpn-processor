@@ -16,9 +16,9 @@ var (
 	logger                                               *zap.Logger
 	metricsPort, writeTimeoutSeconds, readTimeoutSeconds int
 	// SkippedCounter keeps track of skipped vpn servers for various reasons
-	SkippedCounter                                       prometheus.Counter
+	SkippedCounter prometheus.Counter
 	// InsertedCounter keeps track of inserted vpn servers to database
-	InsertedCounter                                      prometheus.Counter
+	InsertedCounter prometheus.Counter
 )
 
 func init() {
