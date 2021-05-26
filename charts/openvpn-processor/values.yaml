@@ -2,7 +2,7 @@
 
 deployment:
   name: openvpn-processor
-  image: vpnbeast/openvpn-processor:1.0.39
+  image: vpnbeast/openvpn-processor:1.0.40
   replicaCount: 1
   managementPort: 9290
   managementEndpoint: /health
