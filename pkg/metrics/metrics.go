@@ -7,14 +7,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"net/http"
-	"openvpn-processor/pkg/config"
 	"openvpn-processor/pkg/logging"
+	"openvpn-processor/pkg/options"
 	"time"
 )
 
 var (
-	logger                                               *zap.Logger
-	metricsPort, writeTimeoutSeconds, readTimeoutSeconds int
+	logger *zap.Logger
+	opts   *options.OpenvpnProcessorOptions
 	// SkippedCounter keeps track of skipped vpn servers for various reasons
 	SkippedCounter prometheus.Counter
 	// InsertedCounter keeps track of inserted vpn servers to database
@@ -23,9 +23,7 @@ var (
 
 func init() {
 	logger = logging.GetLogger()
-	metricsPort = config.GetIntEnv("METRICS_PORT", 3001)
-	writeTimeoutSeconds = config.GetIntEnv("WRITE_TIMEOUT_SECONDS", 10)
-	readTimeoutSeconds = config.GetIntEnv("READ_TIMEOUT_SECONDS", 10)
+	opts = options.GetOpenvpnProcessorOptions()
 	InsertedCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "inserted_server_count",
 		Help: "Counts processed server count on last scheduled execution",
@@ -48,14 +46,14 @@ func RunMetricsServer() {
 	router := mux.NewRouter()
 	metricServer := &http.Server{
 		Handler:      router,
-		Addr:         fmt.Sprintf(":%d", metricsPort),
-		WriteTimeout: time.Duration(int32(writeTimeoutSeconds)) * time.Second,
-		ReadTimeout:  time.Duration(int32(readTimeoutSeconds)) * time.Second,
+		Addr:         fmt.Sprintf(":%d", opts.MetricsPort),
+		WriteTimeout: time.Duration(int32(opts.WriteTimeoutSeconds)) * time.Second,
+		ReadTimeout:  time.Duration(int32(opts.ReadTimeoutSeconds)) * time.Second,
 	}
-	router.Handle("/metrics", promhttp.Handler())
+	router.Handle(opts.MetricsEndpoint, promhttp.Handler())
 	prometheus.MustRegister(InsertedCounter)
 	prometheus.MustRegister(SkippedCounter)
 
-	logger.Info("metric server is up and running", zap.Int("port", metricsPort))
+	logger.Info("metric server is up and running", zap.Int("port", opts.MetricsPort))
 	panic(metricServer.ListenAndServe())
 }

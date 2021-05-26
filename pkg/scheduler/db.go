@@ -2,38 +2,60 @@ package scheduler
 
 import (
 	"database/sql"
+	"fmt"
 	"go.uber.org/zap"
+	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/metrics"
+	"openvpn-processor/pkg/options"
 	"strings"
 	"time"
 )
 
-// InitDb gets parameters and initiate database connection, returns connection then
-func InitDb(dbDriver, dbUrl string, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin int) *sql.DB {
-	db, err := sql.Open(dbDriver, dbUrl)
+var (
+	logger *zap.Logger
+	opts   *options.OpenvpnProcessorOptions
+	db     *sql.DB
+	err    error
+)
+
+func init() {
+	logger = logging.GetLogger()
+	opts = options.GetOpenvpnProcessorOptions()
+	db = initDb()
+}
+
+// GetDatabase returns the initialized sql.DB
+func GetDatabase() *sql.DB {
+	return db
+}
+
+// initDb gets parameters and initiate database connection, returns connection then
+func initDb() *sql.DB {
+	fmt.Print(opts.DbDriver, opts.DbUrl)
+	db, err = sql.Open(opts.DbDriver, opts.DbUrl)
 	if err != nil {
 		logger.Fatal("fatal error occurred while opening database connection", zap.String("error", err.Error()))
 	}
-	tuneDbPooling(db, dbMaxOpenConn, dbMaxIdleConn, dbConnMaxLifetimeMin)
+	tuneDbPooling(db)
 	return db
 }
 
 // Read on https://www.alexedwards.net/blog/configuring-sqldb for detailed explanation
-func tuneDbPooling(db *sql.DB, dbMaxOpenConn int, dbMaxIdleConn int, dbConnMaxLifetimeMin int) {
+func tuneDbPooling(db *sql.DB) {
 	// Set the maximum number of concurrently open connections (in-use + idle)
 	// to 5. Setting this to less than or equal to 0 will mean there is no
 	// maximum limit (which is also the default setting).
-	db.SetMaxOpenConns(dbMaxOpenConn)
+	db.SetMaxOpenConns(opts.DbMaxOpenConn)
 	// Set the maximum number of concurrently idle connections to 5. Setting this
 	// to less than or equal to 0 will mean that no idle connections are retained.
-	db.SetMaxIdleConns(dbMaxIdleConn)
+	db.SetMaxIdleConns(opts.DbMaxIdleConn)
 	// Set the maximum lifetime of a connection to 1 hour. Setting it to 0
 	// means that there is no maximum lifetime and the connection is reused
 	// forever (which is the default behavior).
-	db.SetConnMaxLifetime(time.Duration(int32(dbConnMaxLifetimeMin)) * time.Minute)
+	db.SetConnMaxLifetime(time.Duration(int32(opts.DbConnMaxLifetimeMin)) * time.Minute)
 }
 
-func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
+func checkUnreachableServersOnDB(db *sql.DB) {
 	logger.Info("starting remove unreachable server operation on database")
 	var (
 		removedServerCount  = 0
@@ -62,7 +84,7 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 				zap.String("proto", proto), zap.Int("port", port), zap.String("error", err.Error()))
 		}
 
-		if !isServerInsertable(ip, proto, confData, port, dialTcpTimeoutSeconds) {
+		if !isServerInsertable(ip, proto, confData, port, opts.DialTcpTimeoutSeconds) {
 			removedServerCount++
 			removeServers(db, ip, proto, confData, port)
 		}
@@ -72,7 +94,7 @@ func checkUnreachableServersOnDB(db *sql.DB, dialTcpTimeoutSeconds int) {
 		zap.Duration("executionTime", time.Since(beforeExecution)))
 }
 
-func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int) {
+func insertServers(db *sql.DB, vpnServers []vpnServer) {
 	var (
 		insertedServerCount = 0
 		skippedServerCount  = 0
@@ -82,7 +104,7 @@ func insertServers(db *sql.DB, vpnServers []vpnServer, dialTcpTimeoutSeconds int
 
 	logger.Info("Starting insert reachable server operation on database")
 	for index, server := range vpnServers {
-		if !isServerInsertable(server.ip, server.proto, server.confData, server.port, dialTcpTimeoutSeconds) {
+		if !isServerInsertable(server.ip, server.proto, server.confData, server.port, opts.DialTcpTimeoutSeconds) {
 			skippedServerCount++
 			metrics.SkippedCounter.Inc()
 			continue

@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"openvpn-processor/pkg/config"
+	"openvpn-processor/pkg/options"
 	"strings"
 	"time"
 )
@@ -21,15 +21,15 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 		server := vpnServer{
 			uuid:           uuid.New().String(),
 			hostname:       entry[0],
-			score:          config.ConvertStringToInt(entry[2]),
-			ping:           config.ConvertStringToInt(entry[3]),
-			speed:          config.ConvertStringToInt(entry[4]),
+			score:          options.ConvertStringToInt(entry[2]),
+			ping:           options.ConvertStringToInt(entry[3]),
+			speed:          options.ConvertStringToInt(entry[4]),
 			countryLong:    entry[5],
 			countryShort:   entry[6],
-			numVpnSessions: config.ConvertStringToInt(entry[7]),
-			uptime:         config.ConvertStringToInt(entry[8]),
-			totalUsers:     config.ConvertStringToInt(entry[9]),
-			totalTraffic:   config.ConvertStringToInt(entry[10]),
+			numVpnSessions: options.ConvertStringToInt(entry[7]),
+			uptime:         options.ConvertStringToInt(entry[8]),
+			totalUsers:     options.ConvertStringToInt(entry[9]),
+			totalTraffic:   options.ConvertStringToInt(entry[10]),
 			enabled:        true,
 			createdAt:      time.Now(),
 		}
@@ -46,7 +46,7 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 			fields := strings.Fields(line)
 			if strings.HasPrefix(line, "remote") {
 				server.ip = fields[1]
-				server.port = config.ConvertStringToInt(fields[2])
+				server.port = options.ConvertStringToInt(fields[2])
 			}
 
 			if strings.HasPrefix(line, "proto") {
