@@ -4,7 +4,36 @@ deployment:
   name: openvpn-processor
   image: vpnbeast/openvpn-processor:1.0.40
   replicaCount: 1
-  managementPort: 9290
-  managementEndpoint: /health
-  environment:
-    timezone: Europe/Istanbul
+  ports:
+    - containerPort: 9290
+      name: management-port
+  variables:
+    - name: TZ
+      value: Europe/Istanbul
+  probes:
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /health
+        port: 9290
+        scheme: HTTP
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 10
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /health
+        port: 9290
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 10
+
+service:
+  ports:
+    - name: management-port
+      port: 9290
+      targetPort: 9290
