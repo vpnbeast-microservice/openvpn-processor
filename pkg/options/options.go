@@ -44,8 +44,8 @@ type OpenvpnProcessorOptions struct {
 	WriteTimeoutSeconds int
 	ReadTimeoutSeconds  int
 	// health server related environment variables
-	HealthPort			int
-	HealthEndpoint		string
+	HealthPort     int
+	HealthEndpoint string
 }
 
 // initOptions initializes EncryptionServiceOptions while reading environment values, sets default values if not specified
@@ -66,4 +66,3 @@ func (opo *OpenvpnProcessorOptions) initOptions() {
 	opo.HealthPort = getIntEnv("HEALTH_PORT", 9290)
 	opo.HealthEndpoint = getStringEnv("HEALTH_ENDPOINT", "/health")
 }
-
