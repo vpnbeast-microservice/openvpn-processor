@@ -3,7 +3,7 @@ module openvpn-processor
 go 1.16
 
 require (
-	github.com/etherlabsio/healthcheck v0.0.0-20191224061800-dd3d2fd8c3f6
+	github.com/dimiro1/health v0.0.0-20191019130555-c5cbb4d46ffc
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.2.0

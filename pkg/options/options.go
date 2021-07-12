@@ -45,6 +45,9 @@ type OpenvpnProcessorOptions struct {
 	MetricsEndpoint     string
 	WriteTimeoutSeconds int
 	ReadTimeoutSeconds  int
+	// health server related environment variables
+	HealthPort			int
+	HealthEndpoint		string
 }
 
 // initOptions initializes EncryptionServiceOptions while reading environment values, sets default values if not specified
@@ -62,6 +65,8 @@ func (opo *OpenvpnProcessorOptions) initOptions() {
 	opo.MetricsEndpoint = getStringEnv("METRICS_ENDPOINT", "/metrics")
 	opo.WriteTimeoutSeconds = getIntEnv("WRITE_TIMEOUT_SECONDS", 10)
 	opo.ReadTimeoutSeconds = getIntEnv("READ_TIMEOUT_SECONDS", 10)
+	opo.HealthPort = getIntEnv("HEALTH_PORT", 9290)
+	opo.HealthEndpoint = getStringEnv("HEALTH_ENDPOINT", "/health")
 }
 
 // getStringEnv gets the specific environment variables with default value, returns default value if variable not set
