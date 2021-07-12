@@ -9,6 +9,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/main cmd/open
 ######## Start a new stage from scratch #######
 FROM alpine:latest
 
+RUN apk --no-cache add tzdata \
+    && cp /usr/share/zoneinfo/Europe/Istanbul /etc/localtime \
+    && apk del tzdata
+
 WORKDIR /opt/
 COPY --from=builder /app/bin/main .
 

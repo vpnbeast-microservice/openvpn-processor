@@ -51,7 +51,7 @@ type OpenvpnProcessorOptions struct {
 // initOptions initializes EncryptionServiceOptions while reading environment values, sets default values if not specified
 func (opo *OpenvpnProcessorOptions) initOptions() {
 	opo.VpnGateUrl = getStringEnv("API_URL", "https://www.vpngate.net/api/iphone/")
-	opo.DbUrl = getStringEnv("DB_URL", "spring:123asd456@tcp(127.0.0.1:3306)/vpnbeast")
+	opo.DbUrl = getStringEnv("DB_URL", "spring:123asd456@tcp(127.0.0.1:3306)/vpnbeast?parseTime=true&loc=Local")
 	opo.DbDriver = getStringEnv("DB_DRIVER", "mysql")
 	opo.TickerIntervalMin = getIntEnv("TICKER_INTERVAL_MIN", 10)
 	opo.DbMaxOpenConn = getIntEnv("DB_MAX_OPEN_CONN", 25)
