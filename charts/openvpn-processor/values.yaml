@@ -10,6 +10,18 @@ deployment:
   variables:
     - name: TZ
       value: Europe/Istanbul
+    - name: ACTIVE_PROFILE
+      value: prod
+    - name: DB_URL
+      valueFrom:
+        secretKeyRef:
+          name: openvpn-processor-db
+          key: DB_URL
+    - name: DB_DRIVER
+      valueFrom:
+        secretKeyRef:
+          name: openvpn-processor-db
+          key: DB_DRIVER
   probes:
     livenessProbe:
       failureThreshold: 3
