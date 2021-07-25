@@ -1,0 +1,19 @@
+---
+### Unit testing properties ###
+
+openvpn-processor:
+  vpngateUrl: https://www.vpngate.net/api/iphone/
+  dbUrl: spring:123asd456@tcp(localhost:3306)/vpnbeast?parseTime=true&loc=Local
+  dbDriver: mysql
+  dbMaxOpenConn: 25
+  dbMaxIdleConn: 25
+  dbConnMaxLifetimeMin: 5
+  tickerIntervalMin: 10
+  healthCheckMaxTimeoutMin: 5
+  dialTcpTimeoutSeconds: 5
+  metricsPort: 3001
+  metricsEndpoint: /metrics
+  writeTimeoutSeconds: 10
+  readTimeoutSeconds: 10
+  healthPort: 9290
+  healthEndpoint: /health
