@@ -3,8 +3,8 @@ package scheduler
 import (
 	"database/sql"
 	"fmt"
+	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
-	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/metrics"
 	"openvpn-processor/pkg/options"
 	"strings"
@@ -19,7 +19,7 @@ var (
 )
 
 func init() {
-	logger = logging.GetLogger()
+	logger = commons.GetLogger()
 	opts = options.GetOpenvpnProcessorOptions()
 	db = initDb()
 }

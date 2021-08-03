@@ -5,9 +5,9 @@ import (
 	"github.com/dimiro1/health"
 	"github.com/dimiro1/health/db"
 	"github.com/gorilla/mux"
+	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
 	"net/http"
-	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/options"
 	"openvpn-processor/pkg/scheduler"
 )
@@ -18,7 +18,7 @@ var (
 )
 
 func init() {
-	logger = logging.GetLogger()
+	logger = commons.GetLogger()
 	opts = options.GetOpenvpnProcessorOptions()
 }
 

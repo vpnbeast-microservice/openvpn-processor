@@ -5,9 +5,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
 	"net/http"
-	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/options"
 	"time"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 func init() {
-	logger = logging.GetLogger()
+	logger = commons.GetLogger()
 	opts = options.GetOpenvpnProcessorOptions()
 	InsertedCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "inserted_server_count",

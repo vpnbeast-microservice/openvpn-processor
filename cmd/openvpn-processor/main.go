@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
+	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
-	"openvpn-processor/pkg/logging"
 	"openvpn-processor/pkg/metrics"
 	"openvpn-processor/pkg/options"
 	"openvpn-processor/pkg/probe"
@@ -18,7 +18,7 @@ var (
 
 func init() {
 	opts = options.GetOpenvpnProcessorOptions()
-	logger = logging.GetLogger()
+	logger = commons.GetLogger()
 }
 
 func main() {
