@@ -1,11 +1,8 @@
 package options
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
 	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 var (
@@ -16,7 +13,7 @@ var (
 func init() {
 	logger = commons.GetLogger()
 	opts = newOpenvpnProcessorOptions()
-	err := opts.initOptions()
+	err := commons.InitOptions(opts, "openvpn-processor")
 	if err != nil {
 		logger.Fatal("fatal error occured while initializing options", zap.Error(err))
 	}
@@ -52,50 +49,4 @@ type OpenvpnProcessorOptions struct {
 	// health server related environment variables
 	HealthPort     int    `env:"HEALTH_PORT"`
 	HealthEndpoint string `env:"HEALTH_ENDPOINT"`
-}
-
-// initOptions initializes EncryptionServiceOptions while reading environment values, sets default values if not specified
-func (opo *OpenvpnProcessorOptions) initOptions() error {
-	activeProfile := commons.GetStringEnv("ACTIVE_PROFILE", "local")
-	appName := commons.GetStringEnv("APP_NAME", "openvpn-processor")
-	if activeProfile == "unit-test" {
-		logger.Info("active profile is unit-test, reading configuration from static file")
-		// TODO: better approach for that?
-		viper.AddConfigPath("./../../config")
-		viper.SetConfigName("unit_test")
-		viper.SetConfigType("yaml")
-		if err := viper.ReadInConfig(); err != nil {
-			return err
-		}
-	} else {
-		configHost := commons.GetStringEnv("CONFIG_SERVER_HOST", "localhost")
-		configPort := commons.GetIntEnv("CONFIG_SERVER_PORT", 8888)
-		logger.Info("loading configuration from remote server", zap.String("host", configHost),
-			zap.Int("port", configPort), zap.String("appName", appName),
-			zap.String("activeProfile", activeProfile))
-		confAddr := fmt.Sprintf("http://%s:%d/%s-%s.yaml", configHost, configPort, appName, activeProfile)
-		resp, err := http.Get(confAddr)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			err := resp.Body.Close()
-			if err != nil {
-				panic(err)
-			}
-		}()
-
-		viper.SetConfigName("application")
-		viper.SetConfigType("yaml")
-		if err = viper.ReadConfig(resp.Body); err != nil {
-			return err
-		}
-	}
-
-	if err := commons.UnmarshalConfig(appName, opo); err != nil {
-		return err
-	}
-
-	return nil
 }
