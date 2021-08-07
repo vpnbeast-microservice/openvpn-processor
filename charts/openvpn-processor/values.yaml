@@ -2,7 +2,7 @@
 
 deployment:
   name: openvpn-processor
-  image: vpnbeast/openvpn-processor:1.0.48
+  image: vpnbeast/openvpn-processor:1.0.49
   replicaCount: 1
   ports:
     - containerPort: 9290
