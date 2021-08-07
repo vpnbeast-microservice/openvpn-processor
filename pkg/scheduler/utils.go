@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/google/uuid"
-	commons "github.com/vpnbeast/golang-commons"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
@@ -21,15 +21,15 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 		server := vpnServer{
 			uuid:           uuid.New().String(),
 			hostname:       entry[0],
-			score:          commons.ConvertStringToInt(entry[2]),
-			ping:           commons.ConvertStringToInt(entry[3]),
-			speed:          commons.ConvertStringToInt(entry[4]),
+			score:          cast.ToInt(entry[2]),
+			ping:           cast.ToInt(entry[3]),
+			speed:          cast.ToInt(entry[4]),
 			countryLong:    entry[5],
 			countryShort:   entry[6],
-			numVpnSessions: commons.ConvertStringToInt(entry[7]),
-			uptime:         commons.ConvertStringToInt(entry[8]),
-			totalUsers:     commons.ConvertStringToInt(entry[9]),
-			totalTraffic:   commons.ConvertStringToInt(entry[10]),
+			numVpnSessions: cast.ToInt(entry[7]),
+			uptime:         cast.ToInt(entry[8]),
+			totalUsers:     cast.ToInt(entry[9]),
+			totalTraffic:   cast.ToInt(entry[10]),
 			enabled:        true,
 			createdAt:      time.Now(),
 		}
@@ -46,7 +46,7 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 			fields := strings.Fields(line)
 			if strings.HasPrefix(line, "remote") {
 				server.ip = fields[1]
-				server.port = commons.ConvertStringToInt(fields[2])
+				server.port = cast.ToInt(fields[2])
 			}
 
 			if strings.HasPrefix(line, "proto") {
