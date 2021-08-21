@@ -8,7 +8,7 @@ import (
 	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
 	"net/http"
-	"openvpn-processor/pkg/options"
+	"openvpn-processor/internal/options"
 	"time"
 )
 

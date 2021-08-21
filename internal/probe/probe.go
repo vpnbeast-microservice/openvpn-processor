@@ -8,8 +8,8 @@ import (
 	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
 	"net/http"
-	"openvpn-processor/pkg/options"
-	"openvpn-processor/pkg/scheduler"
+	"openvpn-processor/internal/options"
+	"openvpn-processor/internal/scheduler"
 )
 
 var (

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
-	"openvpn-processor/pkg/metrics"
-	"openvpn-processor/pkg/options"
+	"openvpn-processor/internal/metrics"
+	"openvpn-processor/internal/options"
 	"strings"
 	"time"
 )

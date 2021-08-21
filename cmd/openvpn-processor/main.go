@@ -4,10 +4,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	commons "github.com/vpnbeast/golang-commons"
 	"go.uber.org/zap"
-	"openvpn-processor/pkg/metrics"
-	"openvpn-processor/pkg/options"
-	"openvpn-processor/pkg/probe"
-	"openvpn-processor/pkg/scheduler"
+	"openvpn-processor/internal/metrics"
+	"openvpn-processor/internal/options"
+	"openvpn-processor/internal/probe"
+	"openvpn-processor/internal/scheduler"
 	"time"
 )
 
