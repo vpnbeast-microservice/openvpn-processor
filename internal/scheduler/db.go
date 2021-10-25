@@ -105,7 +105,7 @@ func insertServers(db *sql.DB, vpnServers []vpnServer) {
 	for index, server := range vpnServers {
 		if !isServerInsertable(server.ip, server.proto, server.confData, server.port, opts.DialTcpTimeoutSeconds) {
 			skippedServerCount++
-			metrics.SkippedCounter.Inc()
+			metrics.SkippedServerCounter.Inc()
 			continue
 		}
 
@@ -119,16 +119,20 @@ func insertServers(db *sql.DB, vpnServers []vpnServer) {
 			return
 		}
 
-		if _, err = stmt.Exec(values...); err != nil {
+		var res sql.Result
+		if res, err = stmt.Exec(values...); err != nil {
 			logger.Error("an error occurred while executing query on database", zap.String("server", server.hostname),
 				zap.String("query", sqlReplaceServer), zap.String("error", err.Error()))
 			failedServerCount++
-			metrics.FailedCounter.Inc()
+			metrics.FailedServerCounter.Inc()
 			continue
 		}
 
-		insertedServerCount++
-		metrics.InsertedCounter.Inc()
+		if row, _ := res.RowsAffected(); row == 1 {
+			insertedServerCount++
+			metrics.AvailableServerCounter.Inc()
+		}
+
 		// clear the slice after all
 		values = nil
 	}

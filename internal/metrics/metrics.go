@@ -15,26 +15,26 @@ import (
 var (
 	logger *zap.Logger
 	opts   *options.OpenvpnProcessorOptions
-	// SkippedCounter keeps track of skipped vpn servers for various reasons
-	SkippedCounter prometheus.Counter
-	// InsertedCounter keeps track of inserted vpn servers to database
-	InsertedCounter prometheus.Counter
-	// FailedCounter keeps track of failed vpn servers while inserting
-	FailedCounter prometheus.Counter
+	// SkippedServerCounter keeps track of skipped vpn servers on last scheduled execution
+	SkippedServerCounter prometheus.Counter
+	// AvailableServerCounter keeps track of available vpn servers on last scheduled execution
+	AvailableServerCounter prometheus.Counter
+	// FailedServerCounter keeps track of failed vpn servers on last scheduled execution
+	FailedServerCounter prometheus.Counter
 )
 
 func init() {
 	logger = commons.GetLogger()
 	opts = options.GetOpenvpnProcessorOptions()
-	InsertedCounter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "inserted_server_count",
+	AvailableServerCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "available_server_count",
 		Help: "Counts processed server count on last scheduled execution",
 	})
-	SkippedCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	SkippedServerCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "skipped_server_count",
 		Help: "Counts skipped server count on last scheduled execution",
 	})
-	FailedCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	FailedServerCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "failed_server_count",
 		Help: "Counts failed server count on last scheduled execution",
 	})
@@ -57,9 +57,9 @@ func RunMetricsServer() {
 		ReadTimeout:  time.Duration(int32(opts.ReadTimeoutSeconds)) * time.Second,
 	}
 	router.Handle(opts.MetricsEndpoint, promhttp.Handler())
-	prometheus.MustRegister(InsertedCounter)
-	prometheus.MustRegister(SkippedCounter)
-	prometheus.MustRegister(FailedCounter)
+	prometheus.MustRegister(AvailableServerCounter)
+	prometheus.MustRegister(SkippedServerCounter)
+	prometheus.MustRegister(FailedServerCounter)
 
 	logger.Info("metric server is up and running", zap.Int("port", opts.MetricsPort))
 	panic(metricServer.ListenAndServe())
