@@ -61,11 +61,11 @@ func createStructsFromCsv(csvContent [][]string) []vpnServer {
 }
 
 func getCsvContent(vpnGateUrl string) [][]string {
-	logger.Info("getting server list from vpngate", zap.String("vpnGateUrl", vpnGateUrl))
+	logger.Info("getting server list from API", zap.String("url", vpnGateUrl))
 	var csvContent [][]string
 	resp, err := http.Get(vpnGateUrl)
 	if err != nil {
-		logger.Error("an error occurred while making GET request", zap.String("vpnGateUrl", vpnGateUrl),
+		logger.Error("an error occurred while making GET request", zap.String("url", vpnGateUrl),
 			zap.String("error", err.Error()))
 		return nil
 	}
@@ -101,8 +101,7 @@ func getCsvContent(vpnGateUrl string) [][]string {
 func isServerInsertable(ip, proto, confData string, port int, timeoutSeconds int) bool {
 	isReachable := true
 	timeout := time.Duration(int32(timeoutSeconds)) * time.Second
-	_, err := net.DialTimeout(proto, fmt.Sprintf("%s:%d", ip, port), timeout)
-	if err != nil {
+	if _, err := net.DialTimeout(proto, fmt.Sprintf("%s:%d", ip, port), timeout); err != nil {
 		isReachable = false
 	}
 

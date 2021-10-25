@@ -19,6 +19,8 @@ var (
 	SkippedCounter prometheus.Counter
 	// InsertedCounter keeps track of inserted vpn servers to database
 	InsertedCounter prometheus.Counter
+	// FailedCounter keeps track of failed vpn servers while inserting
+	FailedCounter prometheus.Counter
 )
 
 func init() {
@@ -31,6 +33,10 @@ func init() {
 	SkippedCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "skipped_server_count",
 		Help: "Counts skipped server count on last scheduled execution",
+	})
+	FailedCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "failed_server_count",
+		Help: "Counts failed server count on last scheduled execution",
 	})
 }
 
@@ -53,6 +59,7 @@ func RunMetricsServer() {
 	router.Handle(opts.MetricsEndpoint, promhttp.Handler())
 	prometheus.MustRegister(InsertedCounter)
 	prometheus.MustRegister(SkippedCounter)
+	prometheus.MustRegister(FailedCounter)
 
 	logger.Info("metric server is up and running", zap.Int("port", opts.MetricsPort))
 	panic(metricServer.ListenAndServe())
