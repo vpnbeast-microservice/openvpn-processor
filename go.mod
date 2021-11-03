@@ -12,7 +12,7 @@ require (
 	github.com/prometheus/common v0.30.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/spf13/cast v1.4.1
-	github.com/vpnbeast/golang-commons v0.0.15
+	github.com/vpnbeast/golang-commons v0.0.16
 	go.uber.org/zap v1.19.1
-	golang.org/x/sys v0.0.0-20211025112917-711f33c9992c // indirect
+	golang.org/x/sys v0.0.0-20211103184734-ae416a5f93c7 // indirect
 )
