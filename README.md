@@ -3,6 +3,7 @@
 [![Docker pulls](https://img.shields.io/docker/pulls/vpnbeast/openvpn-processor)](https://hub.docker.com/r/vpnbeast/openvpn-processor/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vpnbeast/openvpn-processor)](https://goreportcard.com/report/github.com/vpnbeast/openvpn-processor)
 [![codecov](https://codecov.io/gh/vpnbeast/openvpn-processor/branch/master/graph/badge.svg)](https://codecov.io/gh/vpnbeast/openvpn-processor)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vpnbeast_openvpn-processor&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vpnbeast_openvpn-processor)
 [![Go version](https://img.shields.io/github/go-mod/go-version/vpnbeast/openvpn-processor)](https://github.com/vpnbeast/openvpn-processor)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

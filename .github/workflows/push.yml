@@ -48,7 +48,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
@@ -102,12 +102,42 @@ jobs:
       - name: Coverage Upload
         run: bash <(curl -s https://codecov.io/bash)
 
+  sonarcloud:
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - vet
+      - ineffassign
+      - test
+      - codeql
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+      - name: Coverage Test
+        run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+        env:
+          ACTIVE_PROFILE: unit-test
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   build:
     needs:
-      - coverage
+      - lint
+      - vet
+      - ineffassign
+      - test
+      - codeql
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
@@ -119,17 +149,28 @@ jobs:
       - name: Test
         run: make build
 
-  dockerize_and_commit:
+  release:
     needs:
+      - coverage
+      - sonarcloud
       - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set tag.sh executable
-        run: chmod +x ci-scripts/tag.sh
-      - name: Run tag.sh
-        run: /bin/bash ci-scripts/tag.sh
+        uses: actions/checkout@v1
+      - name: Set new version
+        env:
+          CHART_NAME: openvpn-processor
+        run: |
+          CURRENT_VERSION=$(grep RELEASE_VERSION version.properties | cut -d "=" -f2)
+          VERSION_MAJOR=$(echo "$CURRENT_VERSION" | cut -d "." -f 1)
+          VERSION_MINOR=$(echo "$CURRENT_VERSION" | cut -d "." -f 2)
+          VERSION_PATCH=$(echo "$CURRENT_VERSION" | cut -d "." -f 3)
+          VERSION_PATCH=$(expr "${VERSION_PATCH}" + 1)
+          RELEASE_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+          sed -i "s/${CURRENT_VERSION}/${RELEASE_VERSION}/g" version.properties
+          sed -i "s/${CURRENT_VERSION}/${RELEASE_VERSION}/g" charts/"${CHART_NAME}"/Chart.yaml
+          sed -i "s/${CURRENT_VERSION}/${RELEASE_VERSION}/g" charts/"${CHART_NAME}"/values.yaml
       - name: Set release_version variable
         run: echo "release_version=$(grep RELEASE_VERSION version.properties | cut -d '=' -f2)" >> $GITHUB_ENV
       - name: Build the Docker image
@@ -141,7 +182,14 @@ jobs:
           tags: "latest,${{ env.release_version }}"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Set commit.sh executable
-        run: chmod +x ci-scripts/commit.sh
-      - name: Run commit.sh
-        run: /bin/bash ci-scripts/commit.sh ${{ secrets.GITHUB_TOKEN }} ${{ env.release_version }}
+      - name: Commit changes to Git repo
+        run: |
+          git config --global user.name vpnbeast-ci
+          git config --global user.email info@thevpnbeast.com
+          git --no-pager diff
+          git add --all
+          git remote add github "https://vpnbeast-ci:${{ secrets.ACTIONS_SECRET }}@github.com/vpnbeast/openvpn-processor.git"
+          git commit -am "[skip ci] version v${{ env.release_version }} released"
+          git tag -a "v${{ env.release_version }}" -m "v${{ env.release_version }} tagged"
+          git status
+          git push github HEAD:master --force --follow-tags
