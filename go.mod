@@ -13,5 +13,5 @@ require (
 	github.com/spf13/afero v1.7.1 // indirect
 	github.com/spf13/cast v1.4.1
 	github.com/vpnbeast/golang-commons v0.0.26
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.20.0
 )
