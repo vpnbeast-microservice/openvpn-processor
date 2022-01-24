@@ -7,9 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
-	github.com/prometheus/client_golang v1.11.0
-	github.com/prometheus/common v0.30.0 // indirect
-	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/prometheus/client_golang v1.12.0
 	github.com/spf13/afero v1.7.1 // indirect
 	github.com/spf13/cast v1.4.1
 	github.com/vpnbeast/golang-commons v0.0.26
